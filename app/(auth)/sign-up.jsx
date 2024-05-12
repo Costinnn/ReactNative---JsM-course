@@ -1,17 +1,43 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 import { images } from "../../constants/index";
 import FormField from "../../components/FormField";
 import CustomButtom from "../../components/CustomButton";
+import { createUser } from "../../lib/appwrite";
 
 const signUp = () => {
+  const { setUser, setIsLogged } = useGlobalContext();
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submit = () => {};
+  const submit = async () => {
+    if (!form.username || !form.email || !form.password) {
+      Alert.alert("Error", "Please fill in all the fields");
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await createUser("me2@example.com", "12345678", "me");
+      // THIS DON't work
+      //const result = await createUser(form.email, form.password, form.username);
+
+      // set to global state
+      setUser(result);
+      setIsLogged(true);
+
+      router.replace("/home");
+    } catch (err) {
+      Alert.alert("Error", err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -49,7 +75,7 @@ const signUp = () => {
             otherStyles="mt-7"
           />
 
-          <CustomButtom title="Sign In" handlePress={submit} containerStyles="mt-7" isLoading={isSubmitting} />
+          <CustomButtom title="Sign Up" handlePress={submit} containerStyles="mt-7" isLoading={isSubmitting} />
 
           <View className="justify-center pt-5 flex-row gap-2">
             <Text className="text-lg text-gray-100 font-pregular">Have an account already?</Text>

@@ -4,10 +4,19 @@ import { StatusBar } from "expo-status-bar";
 import { Redirect, router } from "expo-router";
 import { Image, ScrollView, View, Text } from "react-native";
 
+import { useGlobalContext } from "../context/GlobalProvider";
+
 import { images } from "../constants/index";
 import CustomButton from "../components/CustomButton";
 
 const index = () => {
+  const { isLoading, isLoggedIn } = useGlobalContext();
+  // if (!isLoading && isLoggedIn) return <Redirect href="/home" />;
+
+  // Use this method because appwrite error
+  const falseLogIn = true;
+  if (!isLoading && falseLogIn) return <Redirect href="/home" />;
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
